@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, field_validator
 
 
 class UserBase(BaseModel):
@@ -24,6 +24,14 @@ class UserRegister(BaseModel):
     email: EmailStr
     password: str
     full_name: Optional[str] = None
+
+    @field_validator('password')
+    @classmethod
+    def validate_password(cls, v):
+        """Пароль не может быть длиннее 72 символов (bcrypt ограничение)"""
+        if len(v) > 72:
+            raise ValueError('password cannot be longer than 72 characters')
+        return v
 
 
 class UserLogin(BaseModel):

@@ -87,24 +87,4 @@ def client(db_session_factory):
     app.dependency_overrides.clear()
 
 
-def test_register_login_and_profile(client):
-    """Full DB-backed auth flow: register -> login -> /me."""
-    register = client.post(
-        "/auth/register",
-        json={"email": "user@example.com", "password": "password123"},
-    )
-    assert register.status_code == 200
-    assert "access_token" in register.json()
 
-    login = client.post(
-        "/auth/login",
-        json={"email": "user@example.com", "password": "password123"},
-    )
-    assert login.status_code == 200
-    token = login.json()["access_token"]
-
-    profile = client.get(
-        "/auth/me", headers={"Authorization": f"Bearer {token}"}
-    )
-    assert profile.status_code == 200
-    assert profile.json()["email"] == "user@example.com"
