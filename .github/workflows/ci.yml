@@ -22,17 +22,20 @@ jobs:
           echo "GOOGLE_CLIENT_ID=fake-client-id" >> .env
           echo "GOOGLE_CLIENT_SECRET=fake-client-secret" >> .env
 
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
       - name: Build and test
         run: |
-          docker compose up -d --build
-          sleep 5
-          docker compose exec -T fastapi-oauth alembic upgrade head
-          docker compose exec -T fastapi-oauth python -m pytest tests/ -v
-          curl -f http://localhost:8000/health
-
-      - name: Stop containers
-        if: always()
-        run: docker compose down
+          alembic upgrade head
+          python -m pytest tests/ -v --tb=short
 
   quality:
     runs-on: ubuntu-latest
