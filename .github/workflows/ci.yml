@@ -24,15 +24,15 @@ jobs:
 
       - name: Build and test
         run: |
-          docker-compose up -d --build
+          docker compose up -d --build
           sleep 5
-          docker-compose exec -T fastapi-oauth alembic upgrade head
-          docker-compose exec -T fastapi-oauth python -m pytest tests/ -v
+          docker compose exec -T fastapi-oauth alembic upgrade head
+          docker compose exec -T fastapi-oauth python -m pytest tests/ -v
           curl -f http://localhost:8000/health
 
       - name: Stop containers
         if: always()
-        run: docker-compose down
+        run: docker compose down
 
   quality:
     runs-on: ubuntu-latest
