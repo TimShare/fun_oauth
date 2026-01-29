@@ -25,14 +25,6 @@ class UserRegister(BaseModel):
     password: str
     full_name: Optional[str] = None
 
-    @field_validator('password')
-    @classmethod
-    def validate_password(cls, v):
-        """Пароль не может быть длиннее 72 символов (bcrypt ограничение)"""
-        if len(v) > 72:
-            raise ValueError('password cannot be longer than 72 characters')
-        return v
-
 
 class UserLogin(BaseModel):
     """Модель для входа пользователя"""
