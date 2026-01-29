@@ -1,8 +1,10 @@
 """
 Тесты для FastAPI OAuth приложения
 """
+
 import pytest
 from fastapi.testclient import TestClient
+
 from src.main import app
 
 
@@ -33,11 +35,7 @@ class TestAuthRegistration:
     def test_register_invalid_email(self, client):
         """Регистрация с невалидным email"""
         response = client.post(
-            "/auth/register",
-            json={
-                "email": "invalid-email",
-                "password": "password123"
-            }
+            "/auth/register", json={"email": "invalid-email", "password": "password123"}
         )
         assert response.status_code == 422  # Validation error
 
@@ -54,10 +52,7 @@ class TestAuthLogin:
         """Вход с неправильным паролем"""
         response = client.post(
             "/auth/login",
-            json={
-                "email": "user@example.com",
-                "password": "wrongpassword"
-            }
+            json={"email": "user@example.com", "password": "wrongpassword"},
         )
         assert response.status_code == 401
 
@@ -65,10 +60,7 @@ class TestAuthLogin:
         """Вход несуществующего пользователя"""
         response = client.post(
             "/auth/login",
-            json={
-                "email": "nonexistent@example.com",
-                "password": "password123"
-            }
+            json={"email": "nonexistent@example.com", "password": "password123"},
         )
         assert response.status_code == 401
         assert "Incorrect" in response.json()["detail"]
@@ -76,11 +68,7 @@ class TestAuthLogin:
     def test_login_invalid_email_format(self, client):
         """Вход с невалидным форматом email"""
         response = client.post(
-            "/auth/login",
-            json={
-                "email": "invalid-email",
-                "password": "password123"
-            }
+            "/auth/login", json={"email": "invalid-email", "password": "password123"}
         )
         assert response.status_code == 422
 
@@ -96,8 +84,7 @@ class TestProtectedEndpoints:
     def test_get_profile_invalid_token(self, client):
         """Получение профиля с невалидным токеном"""
         response = client.get(
-            "/auth/me",
-            headers={"Authorization": "Bearer invalid_token"}
+            "/auth/me", headers={"Authorization": "Bearer invalid_token"}
         )
         assert response.status_code == 401
 
@@ -105,10 +92,9 @@ class TestProtectedEndpoints:
         """Получение профиля с истекшим токеном"""
         # Используем токен с истекшим сроком
         expired_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMTIzIiwiZW1haWwiOiJ0ZXN0QGV4YW1wbGUuY29tIiwiZXhwIjoxNjAwMDAwMDAwfQ.invalid"
-        
+
         response = client.get(
-            "/auth/me",
-            headers={"Authorization": f"Bearer {expired_token}"}
+            "/auth/me", headers={"Authorization": f"Bearer {expired_token}"}
         )
         assert response.status_code == 401
 
@@ -181,18 +167,12 @@ class TestPasswordValidation:
 
     def test_register_requires_email(self, client):
         """Регистрация требует email"""
-        response = client.post(
-            "/auth/register",
-            json={"password": "password123"}
-        )
+        response = client.post("/auth/register", json={"password": "password123"})
         assert response.status_code == 422
 
     def test_register_requires_password(self, client):
         """Регистрация требует пароль"""
-        response = client.post(
-            "/auth/register",
-            json={"email": "test@example.com"}
-        )
+        response = client.post("/auth/register", json={"email": "test@example.com"})
         assert response.status_code == 422
 
 
@@ -209,7 +189,6 @@ class TestSecurityHeaders:
         # GET на эндпоинты которые требуют POST должны вернуть 405
         response = client.get("/auth/register")
         assert response.status_code == 405
-        
+
         response = client.get("/auth/login")
         assert response.status_code == 405
-

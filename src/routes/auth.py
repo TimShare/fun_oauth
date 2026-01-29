@@ -1,14 +1,12 @@
+import httpx
+from authlib.integrations.starlette_client import OAuth
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import RedirectResponse
-from authlib.integrations.starlette_client import OAuth
-import httpx
 
 from src.config import get_settings
-from src.models.user import Token, User, UserRegister, UserLogin
-from src.services.auth_service import AuthService
 from src.dependencies.auth import get_auth_service, get_current_user
-from src.models.user import UserInDB
-
+from src.models.user import Token, User, UserInDB, UserLogin, UserRegister
+from src.services.auth_service import AuthService
 
 router = APIRouter(prefix="/auth", tags=["authentication"])
 
@@ -43,8 +41,7 @@ async def google_login():
 
 @router.get("/google/callback")
 async def google_callback(
-    code: str,
-    auth_service: AuthService = Depends(get_auth_service)
+    code: str, auth_service: AuthService = Depends(get_auth_service)
 ):
     """
     Обработка callback от Google после успешной авторизации.
@@ -68,7 +65,7 @@ async def google_callback(
             if "error" in token_data:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    detail=token_data.get("error_description", "Failed to get token")
+                    detail=token_data.get("error_description", "Failed to get token"),
                 )
 
             # Получение информации о пользователе
@@ -88,14 +85,12 @@ async def google_callback(
 
         # Перенаправление на frontend с токеном
         frontend_url = settings.frontend_url
-        return RedirectResponse(
-            url=f"{frontend_url}/?token={token.access_token}"
-        )
+        return RedirectResponse(url=f"{frontend_url}/?token={token.access_token}")
 
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Authentication failed: {str(e)}"
+            detail=f"Authentication failed: {str(e)}",
         )
 
 
@@ -110,7 +105,7 @@ async def get_me(current_user: UserInDB = Depends(get_current_user)):
         email=current_user.email,
         full_name=current_user.full_name,
         picture=current_user.picture,
-        is_active=current_user.is_active
+        is_active=current_user.is_active,
     )
 
 
@@ -125,8 +120,7 @@ async def logout(current_user: UserInDB = Depends(get_current_user)):
 
 @router.post("/register", response_model=Token)
 async def register(
-    user_data: UserRegister,
-    auth_service: AuthService = Depends(get_auth_service)
+    user_data: UserRegister, auth_service: AuthService = Depends(get_auth_service)
 ):
     """
     Регистрация нового пользователя с email и паролем.
@@ -136,34 +130,29 @@ async def register(
         user, token = await auth_service.register_user(
             email=user_data.email,
             password=user_data.password,
-            full_name=user_data.full_name
+            full_name=user_data.full_name,
         )
         return token
     except ValueError as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
 @router.post("/login", response_model=Token)
 async def login(
-    user_data: UserLogin,
-    auth_service: AuthService = Depends(get_auth_service)
+    user_data: UserLogin, auth_service: AuthService = Depends(get_auth_service)
 ):
     """
     Вход пользователя с email и паролем.
     Возвращает JWT токен.
     """
     result = await auth_service.authenticate_user(
-        email=user_data.email,
-        password=user_data.password
+        email=user_data.email, password=user_data.password
     )
 
     if result is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect email or password"
+            detail="Incorrect email or password",
         )
 
     user, token = result

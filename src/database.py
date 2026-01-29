@@ -1,10 +1,12 @@
 """
 SQLAlchemy модели для БД
 """
-from sqlalchemy import Column, String, Boolean, DateTime, create_engine
+
+from datetime import datetime
+
+from sqlalchemy import Boolean, Column, DateTime, String, create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from datetime import datetime
 
 from src.config import get_settings
 
@@ -19,7 +21,7 @@ DATABASE_URL = settings.database_url
 engine = create_engine(
     DATABASE_URL,
     connect_args={"check_same_thread": False} if "sqlite" in DATABASE_URL else {},
-    echo=False
+    echo=False,
 )
 
 # Создаем сессию
@@ -28,6 +30,7 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 class UserModel(Base):
     """Модель пользователя в БД"""
+
     __tablename__ = "users"
 
     id = Column(String, primary_key=True, index=True)

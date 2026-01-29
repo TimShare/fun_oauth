@@ -1,8 +1,9 @@
-from typing import Optional
 from datetime import datetime, timedelta
+from typing import Optional
+
 from jose import JWTError, jwt
 
-from src.models.user import UserInDB, Token, TokenData
+from src.models.user import Token, TokenData, UserInDB
 from src.repositories.user_repository import UserRepositoryInterface
 from src.utils import hash_password, verify_password
 
@@ -15,7 +16,7 @@ class AuthService:
         user_repository: UserRepositoryInterface,
         secret_key: str,
         algorithm: str,
-        access_token_expire_minutes: int
+        access_token_expire_minutes: int,
     ):
         self.user_repository = user_repository
         self.secret_key = secret_key
@@ -27,11 +28,7 @@ class AuthService:
         expires_delta = timedelta(minutes=self.access_token_expire_minutes)
         expire = datetime.utcnow() + expires_delta
 
-        to_encode = {
-            "user_id": user.id,
-            "email": user.email,
-            "exp": expire
-        }
+        to_encode = {"user_id": user.id, "email": user.email, "exp": expire}
 
         encoded_jwt = jwt.encode(to_encode, self.secret_key, algorithm=self.algorithm)
         return Token(access_token=encoded_jwt)
@@ -64,7 +61,7 @@ class AuthService:
         google_id: str,
         email: str,
         full_name: Optional[str] = None,
-        picture: Optional[str] = None
+        picture: Optional[str] = None,
     ) -> tuple[UserInDB, Token]:
         """
         Аутентификация через Google OAuth.
@@ -76,11 +73,9 @@ class AuthService:
         if user is None:
             # Создаем нового пользователя
             from src.models.user import UserCreate
+
             user_create = UserCreate(
-                email=email,
-                google_id=google_id,
-                full_name=full_name,
-                picture=picture
+                email=email, google_id=google_id, full_name=full_name, picture=picture
             )
             user = await self.user_repository.create_user(user_create)
         else:
@@ -99,7 +94,9 @@ class AuthService:
 
         return user, token
 
-    async def register_user(self, email: str, password: str, full_name: Optional[str] = None) -> tuple[UserInDB, Token]:
+    async def register_user(
+        self, email: str, password: str, full_name: Optional[str] = None
+    ) -> tuple[UserInDB, Token]:
         """
         Регистрация нового пользователя с email и паролем
         """
@@ -113,9 +110,7 @@ class AuthService:
 
         # Создаем пользователя
         user = await self.user_repository.create_user_with_password(
-            email=email,
-            hashed_password=hashed_pwd,
-            full_name=full_name
+            email=email, hashed_password=hashed_pwd, full_name=full_name
         )
 
         # Создаем токен
@@ -123,7 +118,9 @@ class AuthService:
 
         return user, token
 
-    async def authenticate_user(self, email: str, password: str) -> Optional[tuple[UserInDB, Token]]:
+    async def authenticate_user(
+        self, email: str, password: str
+    ) -> Optional[tuple[UserInDB, Token]]:
         """
         Аутентификация пользователя по email и паролю
         """

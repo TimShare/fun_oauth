@@ -1,6 +1,6 @@
 from typing import Optional
 
-from src.models.user import UserInDB, User
+from src.models.user import User, UserInDB
 from src.repositories.user_repository import UserRepositoryInterface
 
 
@@ -21,7 +21,7 @@ class UserService:
             email=user_in_db.email,
             full_name=user_in_db.full_name,
             picture=user_in_db.picture,
-            is_active=user_in_db.is_active
+            is_active=user_in_db.is_active,
         )
 
     async def get_user_by_email(self, email: str) -> Optional[User]:
@@ -35,5 +35,5 @@ class UserService:
             email=user_in_db.email,
             full_name=user_in_db.full_name,
             picture=user_in_db.picture,
-            is_active=user_in_db.is_active
+            is_active=user_in_db.is_active,
         )

@@ -1,8 +1,8 @@
 """
 Утилиты для работы с паролями
 """
-from passlib.context import CryptContext
 
+from passlib.context import CryptContext
 
 # Контекст для хеширования паролей
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")

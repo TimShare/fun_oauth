@@ -1,14 +1,13 @@
 from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.orm import Session
 
 from src.config import get_settings
 from src.database import get_db
+from src.models.user import UserInDB
 from src.repositories.user_repository import SQLAlchemyUserRepository
 from src.services.auth_service import AuthService
 from src.services.user_service import UserService
-from src.models.user import UserInDB
-
 
 # Security scheme
 security = HTTPBearer()
@@ -20,7 +19,7 @@ def get_user_repository(db: Session = Depends(get_db)) -> SQLAlchemyUserReposito
 
 
 def get_auth_service(
-    user_repository: SQLAlchemyUserRepository = Depends(get_user_repository)
+    user_repository: SQLAlchemyUserRepository = Depends(get_user_repository),
 ) -> AuthService:
     """Получить сервис аутентификации (Dependency Injection)"""
     settings = get_settings()
@@ -28,12 +27,12 @@ def get_auth_service(
         user_repository=user_repository,
         secret_key=settings.secret_key,
         algorithm=settings.algorithm,
-        access_token_expire_minutes=settings.access_token_expire_minutes
+        access_token_expire_minutes=settings.access_token_expire_minutes,
     )
 
 
 def get_user_service(
-    user_repository: SQLAlchemyUserRepository = Depends(get_user_repository)
+    user_repository: SQLAlchemyUserRepository = Depends(get_user_repository),
 ) -> UserService:
     """Получить сервис пользователей (Dependency Injection)"""
     return UserService(user_repository=user_repository)
@@ -41,7 +40,7 @@ def get_user_service(
 
 async def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(security),
-    auth_service: AuthService = Depends(get_auth_service)
+    auth_service: AuthService = Depends(get_auth_service),
 ) -> UserInDB:
     """
     Получить текущего авторизованного пользователя.
@@ -59,8 +58,7 @@ async def get_current_user(
 
     if not user.is_active:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Inactive user"
+            status_code=status.HTTP_403_FORBIDDEN, detail="Inactive user"
         )
 
     return user

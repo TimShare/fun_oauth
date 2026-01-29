@@ -1,8 +1,9 @@
+import os
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
-import os
+from fastapi.staticfiles import StaticFiles
 
 from src.config import get_settings
 from src.routes.auth import router as auth_router
@@ -16,7 +17,7 @@ def create_app() -> FastAPI:
         title=settings.app_name,
         version=settings.app_version,
         debug=settings.debug,
-        description="FastAPI приложение с чистой архитектурой и Google OAuth авторизацией"
+        description="FastAPI приложение с чистой архитектурой и Google OAuth авторизацией",
     )
 
     # Настройка CORS
@@ -45,7 +46,7 @@ def create_app() -> FastAPI:
         return {
             "message": "Welcome to FastAPI OAuth App",
             "version": settings.app_version,
-            "docs": "/docs"
+            "docs": "/docs",
         }
 
     @app.get("/health")

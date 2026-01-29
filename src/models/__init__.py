@@ -1,3 +1,11 @@
-from .user import User, UserCreate, UserRegister, UserLogin, UserInDB, Token, TokenData
+from .user import Token, TokenData, User, UserCreate, UserInDB, UserLogin, UserRegister
 
-__all__ = ["User", "UserCreate", "UserRegister", "UserLogin", "UserInDB", "Token", "TokenData"]
+__all__ = [
+    "User",
+    "UserCreate",
+    "UserRegister",
+    "UserLogin",
+    "UserInDB",
+    "Token",
+    "TokenData",
+]

@@ -1,11 +1,12 @@
-from abc import ABC, abstractmethod
-from typing import Optional, Dict
-from datetime import datetime
 import uuid
+from abc import ABC, abstractmethod
+from datetime import datetime
+from typing import Dict, Optional
 
 from sqlalchemy.orm import Session
-from src.models.user import UserInDB, UserCreate
+
 from src.database import UserModel
+from src.models.user import UserCreate, UserInDB
 
 
 class UserRepositoryInterface(ABC):
@@ -37,7 +38,9 @@ class UserRepositoryInterface(ABC):
         pass
 
     @abstractmethod
-    async def create_user_with_password(self, email: str, hashed_password: str, full_name: Optional[str] = None) -> UserInDB:
+    async def create_user_with_password(
+        self, email: str, hashed_password: str, full_name: Optional[str] = None
+    ) -> UserInDB:
         """Создать пользователя с паролем"""
         pass
 
@@ -65,7 +68,7 @@ class SQLAlchemyUserRepository(UserRepositoryInterface):
             hashed_password=None,
             is_active=True,
             created_at=now,
-            updated_at=now
+            updated_at=now,
         )
 
         self.db.add(db_user)
@@ -81,10 +84,12 @@ class SQLAlchemyUserRepository(UserRepositoryInterface):
             hashed_password=db_user.hashed_password,
             is_active=db_user.is_active,
             created_at=db_user.created_at,
-            updated_at=db_user.updated_at
+            updated_at=db_user.updated_at,
         )
 
-    async def create_user_with_password(self, email: str, hashed_password: str, full_name: Optional[str] = None) -> UserInDB:
+    async def create_user_with_password(
+        self, email: str, hashed_password: str, full_name: Optional[str] = None
+    ) -> UserInDB:
         """Создать пользователя с паролем (обычная регистрация)"""
         user_id = str(uuid.uuid4())
         now = datetime.utcnow()
@@ -98,7 +103,7 @@ class SQLAlchemyUserRepository(UserRepositoryInterface):
             hashed_password=hashed_password,
             is_active=True,
             created_at=now,
-            updated_at=now
+            updated_at=now,
         )
 
         self.db.add(db_user)
@@ -114,7 +119,7 @@ class SQLAlchemyUserRepository(UserRepositoryInterface):
             hashed_password=db_user.hashed_password,
             is_active=db_user.is_active,
             created_at=db_user.created_at,
-            updated_at=db_user.updated_at
+            updated_at=db_user.updated_at,
         )
 
     async def get_user_by_id(self, user_id: str) -> Optional[UserInDB]:
@@ -132,7 +137,7 @@ class SQLAlchemyUserRepository(UserRepositoryInterface):
             hashed_password=db_user.hashed_password,
             is_active=db_user.is_active,
             created_at=db_user.created_at,
-            updated_at=db_user.updated_at
+            updated_at=db_user.updated_at,
         )
 
     async def get_user_by_email(self, email: str) -> Optional[UserInDB]:
@@ -150,12 +155,14 @@ class SQLAlchemyUserRepository(UserRepositoryInterface):
             hashed_password=db_user.hashed_password,
             is_active=db_user.is_active,
             created_at=db_user.created_at,
-            updated_at=db_user.updated_at
+            updated_at=db_user.updated_at,
         )
 
     async def get_user_by_google_id(self, google_id: str) -> Optional[UserInDB]:
         """Получить пользователя по Google ID"""
-        db_user = self.db.query(UserModel).filter(UserModel.google_id == google_id).first()
+        db_user = (
+            self.db.query(UserModel).filter(UserModel.google_id == google_id).first()
+        )
         if not db_user:
             return None
 
@@ -168,7 +175,7 @@ class SQLAlchemyUserRepository(UserRepositoryInterface):
             hashed_password=db_user.hashed_password,
             is_active=db_user.is_active,
             created_at=db_user.created_at,
-            updated_at=db_user.updated_at
+            updated_at=db_user.updated_at,
         )
 
     async def update_user(self, user_id: str, user_data: Dict) -> Optional[UserInDB]:
@@ -195,5 +202,5 @@ class SQLAlchemyUserRepository(UserRepositoryInterface):
             hashed_password=db_user.hashed_password,
             is_active=db_user.is_active,
             created_at=db_user.created_at,
-            updated_at=db_user.updated_at
+            updated_at=db_user.updated_at,
         )
