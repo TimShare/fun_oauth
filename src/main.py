@@ -52,7 +52,7 @@ def create_app() -> FastAPI:
     @app.get("/health")
     async def health_check():
         """Проверка здоровья приложения"""
-        return {"status": "ok"}
+        return {"status": "healthy"}
 
     return app
 
