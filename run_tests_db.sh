@@ -27,8 +27,8 @@ export GOOGLE_CLIENT_ID="test-client-id"
 export GOOGLE_CLIENT_SECRET="test-client-secret"
 export GOOGLE_REDIRECT_URI="http://localhost:8000/auth/google/callback"
 
-alembic upgrade head
-python -m pytest tests/ -v --tb=short
+python3 -m alembic upgrade head
+python3 -m pytest tests/ -v --tb=short
 
 echo "🧹 Остановка контейнеров..."
 docker compose -f docker-compose.test.yml down -v

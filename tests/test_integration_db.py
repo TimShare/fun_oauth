@@ -91,14 +91,16 @@ def test_register_login_and_profile(client):
     """Full DB-backed auth flow: register -> login -> /me."""
     register = client.post(
         "/auth/register",
-        json={"email": "user@example.com", "password": "password123"},
+        json={"email": "testuser@example.com", "password": "test1234", "full_name": "Test User"},
     )
+    if register.status_code != 200:
+        print(f"ERROR: {register.json()}")
     assert register.status_code == 200
     assert "access_token" in register.json()
 
     login = client.post(
         "/auth/login",
-        json={"email": "user@example.com", "password": "password123"},
+        json={"email": "testuser@example.com", "password": "test1234"},
     )
     assert login.status_code == 200
     token = login.json()["access_token"]
@@ -107,4 +109,7 @@ def test_register_login_and_profile(client):
         "/auth/me", headers={"Authorization": f"Bearer {token}"}
     )
     assert profile.status_code == 200
-    assert profile.json()["email"] == "user@example.com"
+    assert profile.json()["email"] == "testuser@example.com"
+
+
+
